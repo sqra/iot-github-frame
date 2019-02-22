@@ -30,15 +30,18 @@ void checkForUpdates() {
 
       String fwImageURL = fwURL;
       fwImageURL.concat( ".ino.esp32.bin" );
+      Serial.println(fwImageURL);
       t_httpUpdate_return ret = ESPhttpUpdate.update( fwImageURL );
 
       switch (ret) {
           case HTTP_UPDATE_OK:
           Serial.printf("HTTP_UPDATE_OK");
+          Serial.println("");
           break;
 
         case HTTP_UPDATE_FAILED:
           Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
+          Serial.println("");
           break;
 
         case HTTP_UPDATE_NO_UPDATES:
