@@ -2,7 +2,7 @@
  * File:    IoTGitHubFrame.h
  * Author:  Paweł Skórka <skorkapawel@gmail.com>
  * Licnece: GNU General Public License
- * URL:     
+ * URL:     https://github.com/sqra/IoTGitHubFrame
  */
 
 #include "EEPROM.h"

@@ -1,10 +1,10 @@
 const int FW_VERSION = 0.8;
-const char* fwUrlBase = "";
+const char* fwUrlBase = "https://raw.githubusercontent.com/sqra/IoTGitHubFrame/master/OTA/";
 
 // check if there is a new version of the software
 void checkForUpdates() {
   String fwURL = String( fwUrlBase );
-  fwURL.concat( "gitHubFrame" );
+  fwURL.concat( "IoTGithubFrame" );
   String fwVersionURL = fwURL;
   fwVersionURL.concat( ".version" );
 
@@ -29,7 +29,7 @@ void checkForUpdates() {
       Serial.println( "Preparing to update" );
 
       String fwImageURL = fwURL;
-      fwImageURL.concat( ".bin" );
+      fwImageURL.concat( ".ino.esp32.bin" );
       t_httpUpdate_return ret = ESPhttpUpdate.update( fwImageURL );
 
       switch (ret) {
