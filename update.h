@@ -1,4 +1,4 @@
-const int FW_VERSION = 1.0;
+const int FW_VERSION = 1000;
 const char* fwUrlBase = "https://raw.githubusercontent.com/sqra/IoTGitHubFrame/master/OTA/";
 
 // check if there is a new version of the software
