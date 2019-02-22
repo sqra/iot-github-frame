@@ -1,19 +1,51 @@
-const int FW_VERSION = 1000;
-const char* fwUrlBase = "https://raw.githubusercontent.com/sqra/IoTGitHubFrame/master/OTA/";
+const int FW_VERSION = 1;
+const char* versionFileUrlBase = "https://raw.githubusercontent.com/sqra/IoTGitHubFrame/master/OTA/IoTGithubFrame.version";
+const char* binFileUrlBase = "http://rawcdn.githack.com/sqra/IoTGitHubFrame/80b3b30d40305a3f6320795a1a6f87b01cbd65b5/OTA/IoTGithubFrame.ino.esp32.bin";
 
-// check if there is a new version of the software
+// update firmware
+void updateNow() {
+  Serial.println( "Preparing to update firmware" );
+  String binURL = String( binFileUrlBase );
+  Serial.print( "Firmware .bin file URL: " );
+  Serial.println( binURL );
+  HTTPClient espClient;
+  espClient.begin( binURL );
+  int httpCode = espClient.GET();
+  if ( httpCode == 200 ) {
+    
+    t_httpUpdate_return ret = ESPhttpUpdate.update( binURL );
+    
+    switch (ret) {
+      case HTTP_UPDATE_OK:
+        Serial.printf("HTTP_UPDATE_OK");
+        Serial.println("");
+        break;
+
+      case HTTP_UPDATE_FAILED:
+        Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
+        Serial.println("");
+        break;
+
+      case HTTP_UPDATE_NO_UPDATES:
+        Serial.println("HTTP_UPDATE_NO_UPDATES");
+        break;
+    }
+  } else {
+    Serial.print( "Firmware update failed, got HTTP response code " );
+    Serial.println( httpCode );
+  }
+  espClient.end();
+}
+
+// check if there is a new version of the firmware
 void checkForUpdates() {
-  String fwURL = String( fwUrlBase );
-  fwURL.concat( "IoTGithubFrame" );
-  String fwVersionURL = fwURL;
-  fwVersionURL.concat( ".version" );
-
+  String fwURL = String( versionFileUrlBase );
   Serial.println( "Checking for firmware updates." );
   Serial.print( "Firmware version URL: " );
-  Serial.println( fwVersionURL );
+  Serial.println( fwURL );
 
   HTTPClient httpClient;
-  httpClient.begin( fwVersionURL );
+  httpClient.begin( fwURL );
   int httpCode = httpClient.GET();
   if ( httpCode == 200 ) {
     String newFWVersion = httpClient.getString();
@@ -26,31 +58,10 @@ void checkForUpdates() {
     int newVersion = newFWVersion.toInt();
 
     if ( newVersion > FW_VERSION ) {
-      Serial.println( "Preparing to update" );
-
-      String fwImageURL = fwURL;
-      fwImageURL.concat( ".ino.esp32.bin" );
-      Serial.println(fwImageURL);
-      t_httpUpdate_return ret = ESPhttpUpdate.update( fwImageURL );
-
-      switch (ret) {
-          case HTTP_UPDATE_OK:
-          Serial.printf("HTTP_UPDATE_OK");
-          Serial.println("");
-          break;
-
-        case HTTP_UPDATE_FAILED:
-          Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
-          Serial.println("");
-          break;
-
-        case HTTP_UPDATE_NO_UPDATES:
-          Serial.println("HTTP_UPDATE_NO_UPDATES");
-          break;
-      }
+      updateNow();
     }
     else {
-      Serial.println( "Already on latest version" );
+      Serial.println( "Already on latest version." );
     }
   }
   else {

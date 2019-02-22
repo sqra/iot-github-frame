@@ -1,9 +1,9 @@
 /**
- * File:    IoTGitHubFrame.h
- * Author:  Paweł Skórka <skorkapawel@gmail.com>
- * Licnece: GNU General Public License
- * URL:     https://github.com/sqra/IoTGitHubFrame
- */
+   File:    IoTGitHubFrame.h
+   Author:  Paweł Skórka <skorkapawel@gmail.com>
+   Licnece: GNU General Public License
+   URL:     https://github.com/sqra/IoTGitHubFrame
+*/
 
 #include "EEPROM.h"
 #include "WiFiManager.h"
@@ -30,7 +30,7 @@ int NumStep = 0;
 String user = "";
 String repository = "";
 String base_url = "https://api.github.com/repos/";
-const int requestInterval = 90000; // Carefully! GitHub RateLimit -> 60. The maximum number of requests you're permitted to make per hour. 
+const int requestInterval = 90000; // Carefully! GitHub RateLimit -> 60. The maximum number of requests you're permitted to make per hour.
 char errorCode;
 boolean mustReset = true;
 const int CLK_BIG = 17;
@@ -39,7 +39,7 @@ const int CLK_SMALL = 4;
 const int DIO_SMALL = 16;
 const int RED_LED = 22;
 const int GREEN_LED = 23;
-const int AP_LED = 34;
+const int BLUE_LED = 34;
 const int STARS_LED = 18;
 const int WATCHERS_LED = 19;
 const int FORKS_LED = 21;
@@ -94,8 +94,7 @@ void resetTodayStars() {
 
 void configModeCallback (WiFiManager *myWiFiManager) {
   // switch to AP mode
-  digitalWrite(RED_LED, HIGH);
-  digitalWrite(AP_LED, LOW);
+  powerLED("BLUE");
   Serial.println("Entered config mode");
   Serial.println(WiFi.softAPIP());
   Serial.println(myWiFiManager->getConfigPortalSSID());
@@ -118,9 +117,7 @@ void connectWIFI() {
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
   getLocalTime();
   checkForUpdates();
-  digitalWrite(AP_LED, HIGH);
-  digitalWrite(RED_LED, HIGH);
-  digitalWrite(GREEN_LED, LOW);
+  powerLED("GREEN");
   delay(100);
 }
 
@@ -152,16 +149,14 @@ void setup() {
   EEPROM.begin(512);
   pinMode( RED_LED, OUTPUT );
   pinMode( GREEN_LED, OUTPUT );
-  pinMode( AP_LED, OUTPUT);
+  pinMode( BLUE_LED, OUTPUT);
   pinMode( BUILD_IN_LED, OUTPUT);
   pinMode( STARS_LED, OUTPUT);
   pinMode( WATCHERS_LED, OUTPUT);
   pinMode( FORKS_LED, OUTPUT);
   pinMode( BUTTON_IP, INPUT);
   pinMode( BUTTON_RESET_TODAY, INPUT);
-  digitalWrite(RED_LED, LOW);
-  digitalWrite(GREEN_LED, HIGH);
-  digitalWrite(AP_LED, HIGH);
+  powerLED("RED");
   starsToday = EEPROM.read(12);
   user = EEPROM.get(15, arrayToStoreUser);
   repository = EEPROM.get(50, arrayToStoreRepo);
@@ -240,6 +235,22 @@ void notFound(AsyncWebServerRequest *request) {
   request->send(404, "text/plain", "What are you looking for here? It's just a simple frame.");
 }
 
+void powerLED(String color) {
+  if (color == "RED") {
+    digitalWrite(GREEN_LED, HIGH);
+    digitalWrite(RED_LED, LOW);
+    digitalWrite(BLUE_LED, HIGH);
+  } else if (color == "GREEN") {
+    digitalWrite(GREEN_LED, LOW);
+    digitalWrite(RED_LED, HIGH);
+    digitalWrite(BLUE_LED, HIGH);
+  } else if (color == "BLUE") {
+    digitalWrite(GREEN_LED, LOW);
+    digitalWrite(RED_LED, HIGH);
+    digitalWrite(BLUE_LED, HIGH);
+  }
+}
+
 void todayStars() {
   // calculate today's stars
   if (firstRun) {
@@ -257,7 +268,7 @@ void todayStars() {
   delay(100);
 }
 
-void getStars() {
+void getData() {
   // do a GET request to GitHub API and parse json data
   String url = base_url + user + "/" + repository;
   HTTPClient http;
@@ -303,7 +314,7 @@ void Task1code( void * pvParameters ) {
       Serial.print("Please select 'user' and 'repository'.");
       delay(1000);
     }
-    getStars();
+    getData();
     delay(requestInterval);
   }
 }
@@ -312,15 +323,13 @@ void Task2code( void * pvParameters ) {
   // core loop 2
   for (;;) {
     if (WiFi.status() != WL_CONNECTED) {
-      digitalWrite(RED_LED, LOW);
-      digitalWrite(GREEN_LED, HIGH);
+      powerLED("RED");
       Serial.println("WiFi connection lost. Waiting for signal...");
       delay(10000);
       ESP.restart();
     } else {
 
-      digitalWrite(RED_LED, HIGH);
-      digitalWrite(GREEN_LED, LOW);
+      powerLED("GREEN");
       periodReset();
 
       if (digitalRead(BUTTON_IP)) {
