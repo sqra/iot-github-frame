@@ -30,7 +30,7 @@ int NumStep = 0;
 String user = "";
 String repository = "";
 String base_url = "https://api.github.com/repos/";
-const int requestInterval = 90000; // Carefully! GitHub RateLimit -> 60. The maximum number of requests you're permitted to make per hour.
+const int requestInterval = 90; // (in seconds) Carefully! GitHub RateLimit -> 60 requests per hour.
 char errorCode;
 boolean mustReset = true;
 const int CLK_BIG = 17;
@@ -315,7 +315,7 @@ void Task1code( void * pvParameters ) {
       delay(1000);
     }
     getData();
-    delay(requestInterval);
+    delay(requestInterval*1000);
   }
 }
 
