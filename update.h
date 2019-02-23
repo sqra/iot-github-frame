@@ -1,20 +1,25 @@
 const int FW_VERSION = 1;
 const char* versionFileUrlBase = "https://raw.githubusercontent.com/sqra/IoTGitHubFrame/master/OTA/IoTGithubFrame.version";
-const char* binFileUrlBase = "http://rawcdn.githack.com/sqra/IoTGitHubFrame/80b3b30d40305a3f6320795a1a6f87b01cbd65b5/OTA/IoTGithubFrame.ino.esp32.bin";
+const char* binFileUrlStart = "http://rawcdn.githack.com/sqra/IoTGitHubFrame/v";
+const char* binFileUrlEnd = ".0/OTA/IoTGithubFrame.ino.esp32.bin";
 
 // update firmware
-void updateNow() {
+void updateNow(int newVersion) {
   Serial.println( "Preparing to update firmware" );
-  String binURL = String( binFileUrlBase );
+  String binURL = String( binFileUrlStart );
+  String binURLTag = String( newVersion );
+  binURL.concat( binURLTag );
+  String binURLEnd = String( binFileUrlEnd );
+  binURL.concat( binURLEnd );
   Serial.print( "Firmware .bin file URL: " );
   Serial.println( binURL );
   HTTPClient espClient;
   espClient.begin( binURL );
   int httpCode = espClient.GET();
   if ( httpCode == 200 ) {
-    
+
     t_httpUpdate_return ret = ESPhttpUpdate.update( binURL );
-    
+
     switch (ret) {
       case HTTP_UPDATE_OK:
         Serial.printf("HTTP_UPDATE_OK");
@@ -58,7 +63,7 @@ void checkForUpdates() {
     int newVersion = newFWVersion.toInt();
 
     if ( newVersion > FW_VERSION ) {
-      updateNow();
+      updateNow(newVersion);
     }
     else {
       Serial.println( "Already on latest version." );
