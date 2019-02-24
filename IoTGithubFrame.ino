@@ -39,7 +39,7 @@ const int CLK_SMALL = 4;
 const int DIO_SMALL = 16;
 const int RED_LED = 22;
 const int GREEN_LED = 23;
-const int BLUE_LED = 34;
+const int BLUE_LED = 32;
 const int STARS_LED = 18;
 const int WATCHERS_LED = 19;
 const int FORKS_LED = 21;
@@ -56,6 +56,28 @@ TM1637Display largeDisplay(CLK_BIG, DIO_BIG);
 TM1637Display smallDisplay(CLK_SMALL, DIO_SMALL);
 TaskHandle_t Task1;
 TaskHandle_t Task2;
+
+void powerLED(String color)
+{
+  if (color == "RED")
+  {
+    digitalWrite(GREEN_LED, HIGH);
+    digitalWrite(RED_LED, LOW);
+    digitalWrite(BLUE_LED, HIGH);
+  }
+  else if (color == "GREEN")
+  {
+    digitalWrite(GREEN_LED, LOW);
+    digitalWrite(RED_LED, HIGH);
+    digitalWrite(BLUE_LED, HIGH);
+  }
+  else if (color == "BLUE")
+  {
+    digitalWrite(GREEN_LED, HIGH);
+    digitalWrite(RED_LED, HIGH);
+    digitalWrite(BLUE_LED, LOW);
+  }
+}
 
 String getLocalTime() {
   // return time now as String( hh:mm )
@@ -233,22 +255,6 @@ void setup() {
 void notFound(AsyncWebServerRequest *request) {
   // respond when the user gets lost
   request->send(404, "text/plain", "What are you looking for here? It's just a simple frame.");
-}
-
-void powerLED(String color) {
-  if (color == "RED") {
-    digitalWrite(GREEN_LED, HIGH);
-    digitalWrite(RED_LED, LOW);
-    digitalWrite(BLUE_LED, HIGH);
-  } else if (color == "GREEN") {
-    digitalWrite(GREEN_LED, LOW);
-    digitalWrite(RED_LED, HIGH);
-    digitalWrite(BLUE_LED, HIGH);
-  } else if (color == "BLUE") {
-    digitalWrite(GREEN_LED, LOW);
-    digitalWrite(RED_LED, HIGH);
-    digitalWrite(BLUE_LED, HIGH);
-  }
 }
 
 void todayStars() {
