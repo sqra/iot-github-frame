@@ -143,10 +143,24 @@ void connectWIFI() {
   delay(100);
 }
 
+boolean isConfig() {
+  return (repository != "" && repository != "255") || (user != "" && user != "255");
+}
+
+void displaySetRepo() {
+  // show "SEt rEPO" text on large display
+  Serial.println("Please enter 'user name' and 'repository name'.");
+  largeDisplay.setSegments(clearMe);
+  largeDisplay.setSegments(setText, 3, 0);
+  delay(2000);
+  largeDisplay.setSegments(repoText, 4, 0);
+  delay(2000);
+}
+
 void displayIpAddress() {
   // show IP address on large display
   IPAddress frameIP = WiFi.localIP();
-  Serial.print("IP Address on demand: ");
+  Serial.print("IP Address: ");
   Serial.println(WiFi.localIP());
   int ip0 = (int)frameIP[0];
   int ip1 = (int)frameIP[1];
@@ -206,17 +220,16 @@ void setup() {
       repository = EEPROM.get(50, arrayToStoreRepo);
       resetTodayStars();
       request->send(
-        200,
-        "text/html",
-        "<!DOCTYPE html>\n<html style=\"background-color:#446f94\">\n"
-        "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n"
-        "<body style=\"text-align:left;margin:0 auto;color:white;font-family:sans-serif;font-size:14px;padding:20px;\">\n\n"
-        "<div style=\"padding:20px\">"
-        "<p style=\"text-align:center;margin-top:0\">Configuration has been saved successfully. Restarting device ...</p>\n"
-        "</div>\n"
-        "</body>\n"
-        "</html>\n"
-      );
+          200,
+          "text/html",
+          "<!DOCTYPE html>\n<html style=\"background-color:#446f94\">\n"
+          "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n"
+          "<body style=\"text-align:left;margin:0 auto;color:white;font-family:sans-serif;font-size:14px;padding:20px;\">\n\n"
+          "<div style=\"padding:20px;max-width: 400px;margin: 0 auto;\">"
+          "<p style=\"text-align:center;margin-top:0\">Configuration has been saved successfully. Restarting device ...</p>\n"
+          "</div>\n"
+          "</body>\n"
+          "</html>\n");
       Serial.println("Restarting ESP after 3 seconds");
       delay(3000);
       request->redirect("/");
@@ -224,25 +237,26 @@ void setup() {
       ESP.restart();
     }
     request->send(
-      200,
-      "text/html",
-      "<!DOCTYPE html>\n<html style=\"background-color:#446f94\">\n"
-      "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n"
-      "<body style=\"text-align:left;margin:0 auto;color:white;font-family:sans-serif;font-size:14px;padding:20px;\">\n\n"
-      "<div style=\"padding:20px\">"
-      "<h2 style=\"text-align:center;margin-bottom:0\">GitHub Frame</h2>\n"
-      "<p style=\"text-align:center;margin-top:0\">configuration</p>\n"
-      "<form action=\"\" method=\"get\" enctype=\"multipart/form-data\">\n"
-      "<label style=\"display:block;margin-bottom:10px\">User: </label>\n"
-      "<input style=\"display:block;margin-top:6px;margin-bottom:16px;resize:vertical;width:100%;padding:10px;border:1px solid #ccc;border-radius: 4px;box-sizing: border-box;\" placeholder=\"i.e. DivanteLtd\" type=\"text\" id=\"user\" name=\"user\" value=\"" + user + "\" required/>\n<br/>\n"
-      "<label style=\"display:block;margin-bottom:10px\">Repository name: </label>\n"
-      "<input style=\"display:block;margin-top:6px;margin-bottom:16px;resize:vertical;width:100%;padding:10px;border:1px solid #ccc;border-radius: 4px;box-sizing: border-box;\" placeholder=\"i.e. vue-storefront\" type=\"text\" id=\"repository\" name=\"repository\" value=\"" + repository + "\" required/>\n<br/>\n"
-      "<input type=\"submit\" style=\"cursor:pointer;border:none;border-radius:5px;background-color:#375e80;color:white;padding:13px;font-size:18px\" value=\"Save configuration\">\n"
-      "</form>\n\n\n\n"
-      "</div>\n"
-      "</body>\n"
-      "</html>\n"
-    );
+        200,
+        "text/html",
+        "<!DOCTYPE html>\n<html style=\"background-color:#446f94\">\n"
+        "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n"
+        "<body style=\"text-align:left;margin:0 auto;color:white;font-family:sans-serif;font-size:14px;padding:20px;\">\n\n"
+        "<div style=\"padding:20px;max-width: 400px;margin: 0 auto;\">"
+        "<h2 style=\"text-align:center;margin-bottom:0\">GitHub Frame</h2>\n"
+        "<p style=\"text-align:center;margin-top:0\">configuration</p>\n"
+        "<form action=\"\" method=\"get\" enctype=\"multipart/form-data\">\n"
+        "<label style=\"display:block;margin-bottom:10px\">User: </label>\n"
+        "<input style=\"display:block;margin-top:6px;margin-bottom:16px;resize:vertical;width:100%;padding:10px;border:1px solid #ccc;border-radius: 4px;box-sizing: border-box;\" placeholder=\"i.e. DivanteLtd\" type=\"text\" id=\"user\" name=\"user\" value=\"" +
+            user + "\" required/>\n<br/>\n"
+                   "<label style=\"display:block;margin-bottom:10px\">Repository name: </label>\n"
+                   "<input style=\"display:block;margin-top:6px;margin-bottom:16px;resize:vertical;width:100%;padding:10px;border:1px solid #ccc;border-radius: 4px;box-sizing: border-box;\" placeholder=\"i.e. vue-storefront\" type=\"text\" id=\"repository\" name=\"repository\" value=\"" +
+            repository + "\" required/>\n<br/>\n"
+                         "<input type=\"submit\" style=\"cursor:pointer;border:none;border-radius:5px;background-color:#375e80;color:white;padding:13px;font-size:18px\" value=\"Save configuration\">\n"
+                         "</form>\n\n\n\n"
+                         "</div>\n"
+                         "</body>\n"
+                         "</html>\n");
   });
 
   server.onNotFound(notFound);
@@ -315,19 +329,20 @@ void getData() {
 void Task1code( void * pvParameters ) {
   // core loop 1
   for (;;) {
-    getLocalTime();
-    while (repository == "" || user == "") {
-      Serial.print("Please select 'user' and 'repository'.");
-      delay(1000);
+    if (isConfig()){
+      getData();
+      delay(requestInterval * 1000);
+    }else{
+      displaySetRepo();
+      displayIpAddress();
     }
-    getData();
-    delay(requestInterval*1000);
   }
 }
 
 void Task2code( void * pvParameters ) {
   // core loop 2
   for (;;) {
+
     if (WiFi.status() != WL_CONNECTED) {
       powerLED("RED");
       Serial.println("WiFi connection lost. Waiting for signal...");
@@ -335,48 +350,54 @@ void Task2code( void * pvParameters ) {
       ESP.restart();
     } else {
 
-      powerLED("GREEN");
-      periodReset();
+      if (isConfig()) {
 
-      if (digitalRead(BUTTON_IP)) {
-        displayIpAddress();
-      } else if (digitalRead(BUTTON_RESET_TODAY)) {
-        resetTodayStars();
+        powerLED("GREEN");
+        periodReset();
+
+        if (digitalRead(BUTTON_IP)) {
+          displayIpAddress();
+        } else if (digitalRead(BUTTON_RESET_TODAY)) {
+          resetTodayStars();
+        } else {
+          digitalWrite(FORKS_LED, LOW);
+          digitalWrite(STARS_LED, LOW);
+          digitalWrite(WATCHERS_LED, HIGH);
+          largeDisplay.showNumberDec((int)watchers);
+          delay(5000);
+        }
+
+        if (digitalRead(BUTTON_IP)) {
+          displayIpAddress();
+        } else if (digitalRead(BUTTON_RESET_TODAY)) {
+          resetTodayStars();
+        } else {
+          digitalWrite(WATCHERS_LED, LOW);
+          digitalWrite(STARS_LED, LOW);
+          digitalWrite(FORKS_LED, HIGH);
+          largeDisplay.showNumberDec((int)forks);
+          delay(5000);
+        }
+
+        if (digitalRead(BUTTON_IP)) {
+          displayIpAddress();
+        } else if (digitalRead(BUTTON_RESET_TODAY)) {
+          resetTodayStars();
+        } else {
+          digitalWrite(FORKS_LED, LOW);
+          digitalWrite(WATCHERS_LED, LOW);
+          digitalWrite(STARS_LED, HIGH);
+          largeDisplay.showNumberDec((int)stars);
+          delay(5000);
+        }
+
+        smallDisplay.showNumberDec(starsToday);
+        EEPROM.write(12, starsToday);
+        EEPROM.commit();
       } else {
-        digitalWrite(FORKS_LED, LOW);
-        digitalWrite(STARS_LED, LOW);
-        digitalWrite(WATCHERS_LED, HIGH);
-        largeDisplay.showNumberDec((int)watchers);
-        delay(5000);
+        powerLED("RED");
       }
 
-      if (digitalRead(BUTTON_IP)) {
-        displayIpAddress();
-      } else if (digitalRead(BUTTON_RESET_TODAY)) {
-        resetTodayStars();
-      } else {
-        digitalWrite(WATCHERS_LED, LOW);
-        digitalWrite(STARS_LED, LOW);
-        digitalWrite(FORKS_LED, HIGH);
-        largeDisplay.showNumberDec((int)forks);
-        delay(5000);
-      }
-
-      if (digitalRead(BUTTON_IP)) {
-        displayIpAddress();
-      } else if (digitalRead(BUTTON_RESET_TODAY)) {
-        resetTodayStars();
-      } else {
-        digitalWrite(FORKS_LED, LOW);
-        digitalWrite(WATCHERS_LED, LOW);
-        digitalWrite(STARS_LED, HIGH);
-        largeDisplay.showNumberDec((int)stars);
-        delay(5000);
-      }
-
-      smallDisplay.showNumberDec(starsToday);
-      EEPROM.write(12, starsToday);
-      EEPROM.commit();
     }
 
   }
