@@ -47,7 +47,7 @@ const int BUILD_IN_LED = 2;         // NO PIN
 const int BUTTON_IP = 27;           // D27
 const int BUTTON_RESET_TODAY = 15;  // D15
 const char* ntpServer = "pool.ntp.org";
-const long gmtOffset_sec = 3600;
+const long gmtOffset_sec = 0;
 const int daylightOffset_sec = 3600;
 char arrayToStoreUser[50];
 char arrayToStoreRepo[50];
@@ -243,7 +243,7 @@ void setup() {
         "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n"
         "<body style=\"text-align:left;margin:0 auto;color:white;font-family:sans-serif;font-size:14px;padding:20px;\">\n\n"
         "<div style=\"padding:20px;max-width: 400px;margin: 0 auto;\">"
-        "<h2 style=\"text-align:center;margin-bottom:0\">GitHub Frame</h2>\n"
+        "<h2 style=\"text-align:center;margin-bottom:0\">IoT GitHub Frame</h2>\n"
         "<p style=\"text-align:center;margin-top:0\">configuration</p>\n"
         "<form action=\"\" method=\"get\" enctype=\"multipart/form-data\">\n"
         "<label style=\"display:block;margin-bottom:10px\">User: </label>\n"
@@ -330,6 +330,7 @@ void Task1code( void * pvParameters ) {
   // core loop 1
   for (;;) {
     if (isConfig()){
+      getLocalTime();
       getData();
       delay(requestInterval * 1000);
     }else{
