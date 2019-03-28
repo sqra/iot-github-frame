@@ -15,7 +15,7 @@ IoT GitHub Frame is a photo frame with built-in device based on the ESP32 module
 1. ESP-32 WROOM DevKit 1.0 – 1 pc.
 2. 4-digit display TM1637 0.56" - white color– 1 pc.
 3. 4-digit display TM1637 0.36" – 1 pc.
-4. 4-pinowy przewód, żeński – 	żeński – raster 2.54 – 4 pcs.
+4. 4 Pin F/F  200mm Cable – 4 pcs.
 5. JST 1.25 2-Pin Male - Female Connector – 2 pcs.
 6. Micro JST 1.25 2-Pin Male - Female Connector – 2 pcs.
 7. Universal PCB stripboard 50x70mm PI-01 – 1 pc.
