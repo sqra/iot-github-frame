@@ -6,6 +6,15 @@ IoT GitHub Frame is a photo frame with built-in device based on the ESP32 module
 
 ![Cutting holes](/docs/photos/photo_7.jpg)
 
+
+| ![Front view](/docs/photos/ready_1.jpg) | ![Front view](/docs/photos/ready_2.jpg) |
+|--|--|
+| ![Front view](/docs/photos/ready_3.jpg) | ![Front view](/docs/photos/ready_4.jpg) |
+
+
+[YT - Watch "IoT GitHub Frame" in action](https://youtu.be/0hm3B-3gIzI)
+
+
 ## BUILD GUIDE
 
 ### What you will need
@@ -97,12 +106,6 @@ That’s all :)
 Now you can follow the popularity of the selected repository. 
 Have a nice building !
 
-| ![Front view](/docs/photos/ready_1.jpg) | ![Front view](/docs/photos/ready_2.jpg) |
-|--|--|
-| ![Front view](/docs/photos/ready_3.jpg) | ![Front view](/docs/photos/ready_4.jpg) |
-
-
-[YT - Watch "IoT GitHub Frame" in action](https://youtu.be/0hm3B-3gIzI)
 
 ## FAQ
 
